@@ -1,6 +1,6 @@
-# Pulse
+# Pulse Metronome 
 
-An ultra-loud, minimalist metronome engineered specifically for guitarists.
+An ultra-loud, minimalist metronome designed specifically for guitarists.
 
 ![Pulse Metronome Preview](media/readme%20screenshot%20.png)
 
