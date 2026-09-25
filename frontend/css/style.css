@@ -218,7 +218,6 @@ html, body {
   align-items: center;
   gap: 12px;
   line-height: 1;
-  transform: translateY(-2px);
 }
 
 .breadcrumbs span {
