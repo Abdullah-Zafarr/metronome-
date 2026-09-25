@@ -30,9 +30,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const soundGrid = document.getElementById('sound-grid');
   const volSlider = document.getElementById('vol-slider');
   const boostReadout = document.getElementById('boost-readout');
-  const accentSegmented = document.getElementById('accent-segmented');
-  const visualModes = document.getElementById('visual-modes');
-  const presetsGrid = document.getElementById('presets-grid');
   const strobe = document.getElementById('strobe');
 
   // Sidebar Controls
@@ -41,7 +38,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const sidebarCloseBtn = document.getElementById('sidebar-close-btn');
   const floatingSidebarTab = document.getElementById('floating-sidebar-tab');
 
-  let activeVisualMode = 'circle';
   let needleDirection = 1;
 
   // Set BPM in all places
@@ -53,11 +49,6 @@ document.addEventListener('DOMContentLoaded', () => {
     bpmSlider.value = clamped;
 
     updateDialVisuals(clamped);
-
-    presetsGrid.querySelectorAll('.preset-btn').forEach(btn => {
-      const pBpm = parseInt(btn.dataset.bpm, 10);
-      btn.classList.toggle('active', pBpm === clamped);
-    });
   }
 
   function updateDialVisuals(bpm) {
@@ -122,17 +113,11 @@ document.addEventListener('DOMContentLoaded', () => {
         pendulumNeedle.style.transform = `rotate(${swingAngle * 0.3}deg) scale(1.0)`;
       }, 120);
 
-      // 3. Screen Flash for peripheral vision
-      if (activeVisualMode === 'dot' || activeVisualMode === 'circle') {
-        if (isAccent) {
-          strobe.classList.remove('flash-beat');
-          strobe.classList.add('flash-one');
-          setTimeout(() => strobe.classList.remove('flash-one'), 90);
-        } else if (activeVisualMode === 'dot') {
-          strobe.classList.remove('flash-one');
-          strobe.classList.add('flash-beat');
-          setTimeout(() => strobe.classList.remove('flash-beat'), 50);
-        }
+      // 3. Screen Flash on accented downbeat
+      if (isAccent) {
+        strobe.classList.remove('flash-beat');
+        strobe.classList.add('flash-one');
+        setTimeout(() => strobe.classList.remove('flash-one'), 90);
       }
 
       // 4. Subtle beat resonance on living water cinemagraph
@@ -200,31 +185,6 @@ document.addEventListener('DOMContentLoaded', () => {
     boostReadout.textContent = `${val}% BOOST`;
   });
 
-  // Accent Switch
-  accentSegmented.querySelectorAll('.seg-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      accentSegmented.querySelectorAll('.seg-btn').forEach(s => s.classList.remove('active'));
-      btn.classList.add('active');
-      engine.setAccentEnabled(btn.dataset.accent === 'on');
-    });
-  });
-
-  // Visual Modes
-  visualModes.querySelectorAll('.visual-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      visualModes.querySelectorAll('.visual-btn').forEach(v => v.classList.remove('active'));
-      btn.classList.add('active');
-      activeVisualMode = btn.dataset.visual;
-    });
-  });
-
-  // Presets
-  presetsGrid.querySelectorAll('.preset-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const pBpm = parseInt(btn.dataset.bpm, 10);
-      setBpm(pBpm);
-    });
-  });
 
   // Sidebar Toggle Logic
   function toggleSidebar(forceState) {

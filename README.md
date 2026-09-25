@@ -50,9 +50,7 @@ metronome-/
    * **Time Signature**: `2/4`, `3/4`, `4/4`, `5/4`, `6/8`.
    * **Sound Engine**: `Click` (Boss DB-90 guitar piercing sound), `Wood Block`, `Cowbell`, `Clap`.
    * **Volume Boost**: Up to **350%** ("Amp-Cut" boost) with real-time saturation.
-   * **Accent Switch**: `Off` / `On`.
-   * **Visual Modes**: `Circle`, `Bar`, `Dot` (peripheral screen flash).
-   * **Presets**: `Beginner (60)`, `Warm Up (70)`, `Intermediate (90)`, `Advanced (120)`.
+   * **Automatic Downbeat Accent**: Downbeat (Beat 1) is automatically accented across all time signatures with a piercing tone, wider needle swing, and glowing orange flash.
 
 ---
 
