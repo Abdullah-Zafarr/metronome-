@@ -10,6 +10,12 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
+  <script>
+    // Clean URL: Strip any internal folder or file paths from the address bar
+    if (window.location.protocol.startsWith('http') && window.location.pathname.includes('/frontend')) {
+      window.history.replaceState(null, '', window.location.origin + '/');
+    }
+  </script>
 </head>
 <body>
   <!-- Screen flash overlay for visual rhythm -->

@@ -2,13 +2,270 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="refresh" content="0; url=frontend/index.html">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Pulse</title>
-  <script>
-    window.location.replace("frontend/index.html");
-  </script>
+  <meta name="description" content="Pulse — Ultra-loud, minimalist metronome for guitarists with 1-2-3-4 beat tracker.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path d='M20 50 L35 25 L50 75 L65 35 L80 50' stroke='%23ff4136' stroke-width='10' fill='none' stroke-linecap='round'/></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="frontend/css/style.css">
 </head>
-<body style="background:#08090c;color:#f0f2f5;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;">
-  <p>Loading <a href="frontend/index.html" style="color:#ff5e1a;text-decoration:none;font-weight:600;">Pulse</a>...</p>
+<body>
+  <!-- Screen flash overlay for visual rhythm -->
+  <div id="strobe" class="strobe" aria-hidden="true"></div>
+
+  <div class="app-layout">
+    <!-- 1. MAIN STAGE (LEFT & CENTER - FULL SCREEN IMMERSION) -->
+    <main class="main-stage">
+      <!-- Living Cinemagraph Background Video (Silent, Seamless Loop) -->
+      <div class="landscape-backdrop" id="landscape-backdrop" aria-hidden="true">
+        <video id="bg-video" class="bg-video" autoplay loop muted playsinline preload="auto">
+          <source src="media/background video.mp4" type="video/mp4">
+        </video>
+        <div class="bg-video-overlay"></div>
+      </div>
+
+      <!-- Top header banner with Pulse Logo & Breadcrumbs -->
+      <header class="top-nav">
+        <div class="nav-brand-group">
+          <div class="logo">
+            <svg class="logo-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+              <line x1="4" y1="9" x2="4" y2="15"></line>
+              <line x1="8" y1="5" x2="8" y2="19"></line>
+              <line x1="12" y1="2" x2="12" y2="22"></line>
+              <line x1="16" y1="6" x2="16" y2="18"></line>
+              <line x1="20" y1="10" x2="20" y2="14"></line>
+            </svg>
+            <span class="logo-text">Pulse</span>
+          </div>
+
+          <div class="breadcrumbs">
+            <span>PRACTICE</span>
+            <span class="sep">/</span>
+            <span>PROGRESS</span>
+            <span class="sep">/</span>
+            <span>REPEAT</span>
+          </div>
+        </div>
+
+        <div class="top-actions">
+          <button class="icon-btn" id="sidebar-toggle-btn" title="Toggle Sidebar (H)" aria-label="Toggle Sidebar">
+            <svg class="panel-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="3"></rect>
+              <line x1="15" y1="3" x2="15" y2="21"></line>
+            </svg>
+          </button>
+          <button class="icon-btn" title="Guitarist Profile" aria-label="Guitarist Profile">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+          </button>
+        </div>
+      </header>
+
+      <!-- Center Cockpit Display -->
+      <div class="cockpit-content">
+        <!-- Tempo Hero Readout -->
+        <div class="tempo-hero">
+          <span class="hero-label">TEMPO</span>
+          <div class="hero-bpm" id="hero-bpm-display">90</div>
+          <span class="hero-unit">BPM</span>
+        </div>
+
+        <!-- Circular Dial & Pendulum -->
+        <div class="dial-container">
+          <svg class="dial-svg" viewBox="0 0 260 260">
+            <circle class="dial-track" cx="130" cy="130" r="110"></circle>
+            <circle class="dial-progress" id="dial-progress" cx="130" cy="130" r="110"></circle>
+          </svg>
+
+          <!-- Outer dot tracker -->
+          <div class="dial-dot-wrapper" id="dial-dot-wrapper">
+            <div class="dial-dot" id="dial-dot"></div>
+          </div>
+
+          <!-- Inset ring and glowing pendulum needle -->
+          <div class="dial-inner">
+            <div class="pendulum-needle" id="pendulum-needle"></div>
+          </div>
+        </div>
+
+        <!-- 1 2 3 4 BEAT TRACKER -->
+        <div class="beat-tracker" id="beat-tracker" aria-label="1 2 3 4 Beat Tracker">
+          <div class="beat-pill" id="beat-1" data-beat="1">
+            <span class="pill-num">1</span>
+          </div>
+          <div class="beat-pill" id="beat-2" data-beat="2">
+            <span class="pill-num">2</span>
+          </div>
+          <div class="beat-pill" id="beat-3" data-beat="3">
+            <span class="pill-num">3</span>
+          </div>
+          <div class="beat-pill" id="beat-4" data-beat="4">
+            <span class="pill-num">4</span>
+          </div>
+        </div>
+
+        <!-- Time Signature Tag -->
+        <div class="time-sig-hero">
+          <span class="sig-val" id="sig-hero-val">4 / 4</span>
+          <span class="sig-label">TIME SIGNATURE</span>
+        </div>
+
+        <!-- Transport Controls -->
+        <div class="transport-controls">
+          <button class="transport-btn skip-btn" id="bpm-minus-btn" title="Decrease BPM (-5)" aria-label="Decrease BPM by 5">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+              <polygon points="19 20 9 12 19 4 19 20"></polygon>
+              <line x1="5" y1="19" x2="5" y2="5" stroke="currentColor" stroke-width="2.5"></line>
+            </svg>
+          </button>
+
+          <button class="transport-btn play-main-btn" id="play-btn" title="Start / Stop Metronome (Spacebar)" aria-label="Play / Pause Metronome">
+            <svg class="icon-play" id="icon-play" viewBox="0 0 24 24" width="30" height="30" fill="currentColor">
+              <polygon points="7 4 19 12 7 20 7 4"></polygon>
+            </svg>
+            <svg class="icon-pause" id="icon-pause" viewBox="0 0 24 24" width="30" height="30" fill="currentColor" style="display:none;">
+              <rect x="6" y="4" width="4" height="16"></rect>
+              <rect x="14" y="4" width="4" height="16"></rect>
+            </svg>
+          </button>
+
+          <button class="transport-btn skip-btn" id="bpm-plus-btn" title="Increase BPM (+5)" aria-label="Increase BPM by 5">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+              <polygon points="5 4 15 12 5 20 5 4"></polygon>
+              <line x1="19" y1="5" x2="19" y2="19" stroke="currentColor" stroke-width="2.5"></line>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Floating Sidebar Open Tab (visible when sidebar is hidden) -->
+      <button class="floating-sidebar-tab" id="floating-sidebar-tab" title="Open Controls (H)" aria-label="Open Controls">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+        <span>Controls</span>
+      </button>
+    </main>
+
+    <!-- 2. RIGHT CONTROL SIDEBAR (EXPANDED & MORE SPACIOUS) -->
+    <aside class="control-panel" id="control-panel">
+      <!-- Sidebar Header with Close Button -->
+      <div class="sidebar-header">
+        <div class="sidebar-title-wrap">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="4" y1="21" x2="4" y2="14"></line>
+            <line x1="4" y1="10" x2="4" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="12"></line>
+            <line x1="12" y1="8" x2="12" y2="3"></line>
+            <line x1="20" y1="21" x2="20" y2="16"></line>
+            <line x1="20" y1="12" x2="20" y2="3"></line>
+            <line x1="1" y1="14" x2="7" y2="14"></line>
+            <line x1="9" y1="8" x2="15" y2="8"></line>
+            <line x1="17" y1="16" x2="23" y2="16"></line>
+          </svg>
+          <span class="sidebar-title">Controls</span>
+        </div>
+        <button class="sidebar-close-btn" id="sidebar-close-btn" title="Hide Sidebar (H)" aria-label="Hide Sidebar">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <!-- 1. Tempo Section -->
+      <section class="panel-card">
+        <h4 class="card-title">Tempo</h4>
+        <div class="stepper-wrap">
+          <button class="mini-step-btn" id="step-minus" aria-label="Decrease BPM">−</button>
+          <div class="bpm-pill">
+            <input type="number" id="bpm-input" min="30" max="300" value="90" aria-label="BPM value">
+          </div>
+          <button class="mini-step-btn" id="step-plus" aria-label="Increase BPM">+</button>
+        </div>
+        <div class="slider-container">
+          <input type="range" id="bpm-slider" min="30" max="300" value="90" class="red-slider" aria-label="Tempo Slider">
+          <div class="slider-bounds">
+            <span>30</span>
+            <span>300</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. Time Signature -->
+      <section class="panel-card">
+        <h4 class="card-title">Time Signature</h4>
+        <div class="chip-grid" id="time-sig-chips">
+          <button class="chip-btn" data-sig="2/4">2/4</button>
+          <button class="chip-btn" data-sig="3/4">3/4</button>
+          <button class="chip-btn active" data-sig="4/4">4/4</button>
+          <button class="chip-btn" data-sig="5/4">5/4</button>
+          <button class="chip-btn" data-sig="6/8">6/8</button>
+        </div>
+      </section>
+
+      <!-- 3. Sound -->
+      <section class="panel-card">
+        <h4 class="card-title">Sound</h4>
+        <div class="sound-grid" id="sound-grid">
+          <button class="sound-btn active" data-sound="click">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+              <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+            </svg>
+            <span>Click</span>
+          </button>
+
+          <button class="sound-btn" data-sound="woodblock">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+            </svg>
+            <span>Wood Block</span>
+          </button>
+
+          <button class="sound-btn" data-sound="cowbell">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+            </svg>
+            <span>Cowbell</span>
+          </button>
+
+          <button class="sound-btn" data-sound="clap">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 11V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0"></path>
+              <path d="M14 10V4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v2"></path>
+              <path d="M10 10.5V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v8"></path>
+              <path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"></path>
+            </svg>
+            <span>Clap</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- 4. Super Loud Guitar Boost -->
+      <section class="panel-card">
+        <div class="card-header-split">
+          <h4 class="card-title">Volume Boost</h4>
+          <span class="badge-boost" id="boost-readout">300% BOOST</span>
+        </div>
+        <div class="slider-container">
+          <input type="range" id="vol-slider" min="50" max="350" value="300" class="red-slider" aria-label="Volume Slider">
+          <div class="slider-bounds">
+            <span>50%</span>
+            <span>350% Max</span>
+          </div>
+        </div>
+      </section>
+    </aside>
+  </div>
+
+  <script src="frontend/js/audio-engine.js"></script>
+  <script src="frontend/js/water-cinemagraph.js"></script>
+  <script src="frontend/js/app.js"></script>
 </body>
 </html>
