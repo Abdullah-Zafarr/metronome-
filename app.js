@@ -1,0 +1,282 @@
+/**
+ * Pulse Metronome Controller — Pure Minimalist Edition
+ * High-precision sample-accurate audio + 1 2 3 4 Beat Tracker
+ */
+document.addEventListener('DOMContentLoaded', () => {
+  const engine = new MetronomeAudioEngine();
+  const waterCinemagraph = window.WaterCinemagraph ? new WaterCinemagraph('water-canvas', 'pulse-bg.jpg') : null;
+
+  // Central Hero Elements
+  const heroBpmDisplay = document.getElementById('hero-bpm-display');
+  const dialProgress = document.getElementById('dial-progress');
+  const dialDotWrapper = document.getElementById('dial-dot-wrapper');
+  const pendulumNeedle = document.getElementById('pendulum-needle');
+  const beatTracker = document.getElementById('beat-tracker');
+  const sigHeroVal = document.getElementById('sig-hero-val');
+
+  // Transport Controls
+  const playBtn = document.getElementById('play-btn');
+  const iconPlay = document.getElementById('icon-play');
+  const iconPause = document.getElementById('icon-pause');
+  const bpmMinusBtn = document.getElementById('bpm-minus-btn');
+  const bpmPlusBtn = document.getElementById('bpm-plus-btn');
+
+  // Right Control Sidebar Elements
+  const stepMinus = document.getElementById('step-minus');
+  const stepPlus = document.getElementById('step-plus');
+  const bpmInput = document.getElementById('bpm-input');
+  const bpmSlider = document.getElementById('bpm-slider');
+  const timeSigChips = document.getElementById('time-sig-chips');
+  const soundGrid = document.getElementById('sound-grid');
+  const volSlider = document.getElementById('vol-slider');
+  const boostReadout = document.getElementById('boost-readout');
+  const accentSegmented = document.getElementById('accent-segmented');
+  const visualModes = document.getElementById('visual-modes');
+  const presetsGrid = document.getElementById('presets-grid');
+  const strobe = document.getElementById('strobe');
+
+  // Sidebar Controls
+  const appLayout = document.querySelector('.app-layout');
+  const sidebarToggleBtn = document.getElementById('sidebar-toggle-btn');
+  const sidebarCloseBtn = document.getElementById('sidebar-close-btn');
+  const floatingSidebarTab = document.getElementById('floating-sidebar-tab');
+
+  let activeVisualMode = 'circle';
+  let needleDirection = 1;
+
+  // Set BPM in all places
+  function setBpm(val) {
+    const clamped = Math.max(30, Math.min(300, Math.round(val)));
+    engine.setBpm(clamped);
+    heroBpmDisplay.textContent = clamped;
+    bpmInput.value = clamped;
+    bpmSlider.value = clamped;
+
+    updateDialVisuals(clamped);
+
+    presetsGrid.querySelectorAll('.preset-btn').forEach(btn => {
+      const pBpm = parseInt(btn.dataset.bpm, 10);
+      btn.classList.toggle('active', pBpm === clamped);
+    });
+  }
+
+  function updateDialVisuals(bpm) {
+    const circumference = 691.15;
+    const ratio = (bpm - 30) / (300 - 30);
+    const offset = circumference * (1 - ratio);
+    dialProgress.style.strokeDashoffset = offset;
+
+    const degrees = ratio * 360;
+    dialDotWrapper.style.transform = `rotate(${degrees}deg)`;
+  }
+
+  // Render 1 2 3 4 Beat Tracker
+  function renderBeatTracker(beats) {
+    beatTracker.innerHTML = '';
+    for (let i = 1; i <= beats; i++) {
+      const pill = document.createElement('div');
+      pill.className = 'beat-pill';
+      pill.id = `beat-${i}`;
+      pill.dataset.beat = i;
+
+      const num = document.createElement('span');
+      num.className = 'pill-num';
+      num.textContent = i;
+      pill.appendChild(num);
+
+      if (i === 1) {
+        const tag = document.createElement('span');
+        tag.className = 'pill-tag';
+        tag.textContent = 'DOWN';
+        pill.appendChild(tag);
+      }
+
+      beatTracker.appendChild(pill);
+    }
+  }
+
+  // Audio-Synchronized Beat Indicator
+  engine.onBeat = (beatNumber, isAccent, audioTime, totalBeats) => {
+    if (!engine.audioCtx) return;
+
+    const delayMs = Math.max(0, (audioTime - engine.audioCtx.currentTime) * 1000);
+
+    setTimeout(() => {
+      // 1. Highlight the active beat pill (1, 2, 3, 4)
+      const pills = beatTracker.querySelectorAll('.beat-pill');
+      pills.forEach(pill => {
+        const pillBeat = parseInt(pill.dataset.beat, 10);
+        if (pillBeat === beatNumber) {
+          pill.classList.add('hit');
+          setTimeout(() => pill.classList.remove('hit'), 150);
+        } else {
+          pill.classList.remove('hit');
+        }
+      });
+
+      // 2. Animate pendulum needle
+      needleDirection = -needleDirection;
+      const swingAngle = isAccent ? 24 * needleDirection : 16 * needleDirection;
+      pendulumNeedle.style.transform = `rotate(${swingAngle}deg) scale(${isAccent ? 1.15 : 1.0})`;
+      setTimeout(() => {
+        pendulumNeedle.style.transform = `rotate(${swingAngle * 0.3}deg) scale(1.0)`;
+      }, 120);
+
+      // 3. Screen Flash for peripheral vision
+      if (activeVisualMode === 'dot' || activeVisualMode === 'circle') {
+        if (isAccent) {
+          strobe.classList.remove('flash-beat');
+          strobe.classList.add('flash-one');
+          setTimeout(() => strobe.classList.remove('flash-one'), 90);
+        } else if (activeVisualMode === 'dot') {
+          strobe.classList.remove('flash-one');
+          strobe.classList.add('flash-beat');
+          setTimeout(() => strobe.classList.remove('flash-beat'), 50);
+        }
+      }
+
+      // 4. Subtle beat resonance on living water cinemagraph
+      if (waterCinemagraph) {
+        waterCinemagraph.pulseBeat(isAccent);
+      }
+    }, delayMs);
+  };
+
+  // Play / Pause Toggle
+  function togglePlay() {
+    if (engine.isPlaying) {
+      engine.stop();
+      playBtn.classList.remove('playing');
+      iconPlay.style.display = 'block';
+      iconPause.style.display = 'none';
+      pendulumNeedle.style.transform = 'rotate(0deg)';
+      beatTracker.querySelectorAll('.beat-pill').forEach(p => p.classList.remove('hit'));
+    } else {
+      engine.start();
+      playBtn.classList.add('playing');
+      iconPlay.style.display = 'none';
+      iconPause.style.display = 'block';
+    }
+  }
+
+  playBtn.addEventListener('click', togglePlay);
+
+  // Steppers & Sliders
+  bpmSlider.addEventListener('input', () => setBpm(parseInt(bpmSlider.value, 10)));
+  bpmInput.addEventListener('change', () => setBpm(parseInt(bpmInput.value, 10) || 90));
+
+  stepMinus.addEventListener('click', () => setBpm(engine.bpm - 1));
+  stepPlus.addEventListener('click', () => setBpm(engine.bpm + 1));
+  bpmMinusBtn.addEventListener('click', () => setBpm(engine.bpm - 5));
+  bpmPlusBtn.addEventListener('click', () => setBpm(engine.bpm + 5));
+
+  // Time Signatures
+  timeSigChips.querySelectorAll('.chip-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      timeSigChips.querySelectorAll('.chip-btn').forEach(c => c.classList.remove('active'));
+      btn.classList.add('active');
+
+      const sig = btn.dataset.sig;
+      sigHeroVal.textContent = sig.replace('/', ' / ');
+      const beats = parseInt(sig.split('/')[0], 10);
+      engine.setTimeSignature(beats);
+      renderBeatTracker(beats);
+    });
+  });
+
+  // Sound Engine
+  soundGrid.querySelectorAll('.sound-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      soundGrid.querySelectorAll('.sound-btn').forEach(s => s.classList.remove('active'));
+      btn.classList.add('active');
+      engine.setSoundType(btn.dataset.sound);
+    });
+  });
+
+  // Volume Boost Slider
+  volSlider.addEventListener('input', (e) => {
+    const val = parseInt(e.target.value, 10);
+    engine.setVolume(val);
+    boostReadout.textContent = `${val}% BOOST`;
+  });
+
+  // Accent Switch
+  accentSegmented.querySelectorAll('.seg-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      accentSegmented.querySelectorAll('.seg-btn').forEach(s => s.classList.remove('active'));
+      btn.classList.add('active');
+      engine.setAccentEnabled(btn.dataset.accent === 'on');
+    });
+  });
+
+  // Visual Modes
+  visualModes.querySelectorAll('.visual-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      visualModes.querySelectorAll('.visual-btn').forEach(v => v.classList.remove('active'));
+      btn.classList.add('active');
+      activeVisualMode = btn.dataset.visual;
+    });
+  });
+
+  // Presets
+  presetsGrid.querySelectorAll('.preset-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const pBpm = parseInt(btn.dataset.bpm, 10);
+      setBpm(pBpm);
+    });
+  });
+
+  // Sidebar Toggle Logic
+  function toggleSidebar(forceState) {
+    if (!appLayout) return;
+    const isCollapsed = appLayout.classList.contains('sidebar-collapsed');
+    const targetState = typeof forceState === 'boolean' ? forceState : !isCollapsed;
+    appLayout.classList.toggle('sidebar-collapsed', targetState);
+    if (sidebarToggleBtn) {
+      sidebarToggleBtn.title = targetState ? 'Show Sidebar (H)' : 'Hide Sidebar (H)';
+      sidebarToggleBtn.setAttribute('aria-expanded', !targetState);
+    }
+  }
+
+  sidebarToggleBtn?.addEventListener('click', () => toggleSidebar());
+  sidebarCloseBtn?.addEventListener('click', () => toggleSidebar(true));
+  floatingSidebarTab?.addEventListener('click', () => toggleSidebar(false));
+
+  // Global Keyboard Shortcuts
+  window.addEventListener('keydown', (e) => {
+    if (e.target.tagName === 'INPUT') return;
+
+    if (e.code === 'Space') {
+      e.preventDefault();
+      togglePlay();
+    } else if (e.code === 'KeyH') {
+      e.preventDefault();
+      toggleSidebar();
+    } else if (e.code === 'ArrowUp') {
+      e.preventDefault();
+      setBpm(engine.bpm + (e.shiftKey ? 5 : 1));
+    } else if (e.code === 'ArrowDown') {
+      e.preventDefault();
+      setBpm(engine.bpm - (e.shiftKey ? 5 : 1));
+    }
+  });
+
+  // Expose global methods for testing & control
+  window.__pulseEngine = engine;
+  window.__setBpm = setBpm;
+  window.__togglePlay = togglePlay;
+  window.__toggleSidebar = toggleSidebar;
+  window.__waterCinemagraph = waterCinemagraph;
+
+  // Ensure the main stage never scrolls or rubber-bands
+  const mainStage = document.querySelector('.main-stage');
+  if (mainStage) {
+    mainStage.addEventListener('wheel', (e) => {
+      e.preventDefault();
+    }, { passive: false });
+  }
+
+  // Initial setup: 90 BPM, 4/4
+  setBpm(90);
+  renderBeatTracker(4);
+});
