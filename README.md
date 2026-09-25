@@ -2,7 +2,32 @@
 
 An ultra-loud, minimalist metronome engineered specifically for guitarists. Features sample-accurate audio timing, an integrated **1 2 3 4 Beat Tracker**, a living mountain sunset cinemagraph video backdrop, a collapsible control sidebar, and studio-grade dark/sunset-orange styling.
 
-![Pulse Metronome Preview](readme%20screenshot%20.png)
+![Pulse Metronome Preview](media/readme%20screenshot%20.png)
+
+---
+
+## 📁 Project Structure
+
+```text
+metronome-/
+├── backend/
+│   └── server.js             # Lightweight Node.js server with HTTP Range video streaming
+├── frontend/
+│   ├── css/
+│   │   └── style.css         # Single-viewport layout, thick black navbar & scrollbar
+│   ├── js/
+│   │   ├── app.js            # Main UI, BPM synchronization, and sidebar toggle logic
+│   │   ├── audio-engine.js   # Web Audio sample-accurate click synthesis
+│   │   └── water-cinemagraph.js # Visual resonance engine
+│   └── index.html            # Main application UI
+├── media/
+│   ├── background video.mp4  # Seamless mountain sunset cinemagraph video
+│   ├── pulse-bg.jpg          # High-resolution landscape fallback backdrop
+│   └── readme screenshot .png# Application preview screenshot
+├── index.html                # Root entry redirect to frontend/
+├── package.json              # Project scripts & configuration
+└── README.md
+```
 
 ---
 
@@ -32,7 +57,21 @@ An ultra-loud, minimalist metronome engineered specifically for guitarists. Feat
 ---
 
 ## 🚀 How to Run
-Visit **`http://localhost:8000`** or open **`index.html`** in any web browser.
+
+### Option 1: Node.js Backend Server (Recommended)
+```bash
+npm start
+```
+Then visit **`http://localhost:3000`** in your browser.
+
+### Option 2: Direct Browser / Static Server
+Open **`index.html`** or **`frontend/index.html`** directly in any modern web browser or run:
+```bash
+python -m http.server 8000
+```
+Then visit **`http://localhost:8000`**.
+
+---
 
 ### Shortcuts
 * <kbd>Space</kbd> — Start / Stop Metronome

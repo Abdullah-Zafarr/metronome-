@@ -4,7 +4,7 @@
  */
 document.addEventListener('DOMContentLoaded', () => {
   const engine = new MetronomeAudioEngine();
-  const waterCinemagraph = window.WaterCinemagraph ? new WaterCinemagraph('water-canvas', 'pulse-bg.jpg') : null;
+  const waterCinemagraph = window.WaterCinemagraph ? new WaterCinemagraph('water-canvas', '../media/pulse-bg.jpg') : null;
 
   // Central Hero Elements
   const heroBpmDisplay = document.getElementById('hero-bpm-display');
