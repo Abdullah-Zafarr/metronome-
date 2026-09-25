@@ -1,4 +1,4 @@
-# Pulse — Minimalist Metronome (Guitar Edition)
+# Pulse
 
 An ultra-loud, minimalist metronome engineered specifically for guitarists.
 
