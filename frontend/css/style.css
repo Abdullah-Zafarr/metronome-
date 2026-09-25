@@ -407,14 +407,6 @@ html, body {
   line-height: 1;
 }
 
-.pill-tag {
-  font-size: clamp(0.48rem, 0.75vh, 0.55rem);
-  font-weight: 700;
-  letter-spacing: 0.6px;
-  color: var(--text-muted);
-  margin-top: 2px;
-}
-
 .beat-pill#beat-1.hit {
   background: var(--accent-red);
   border-color: #ff857d;
@@ -422,8 +414,7 @@ html, body {
   box-shadow: 0 0 28px var(--accent-red-glow), inset 0 0 8px #fff;
 }
 
-.beat-pill#beat-1.hit .pill-num,
-.beat-pill#beat-1.hit .pill-tag {
+.beat-pill#beat-1.hit .pill-num {
   color: #fff;
 }
 

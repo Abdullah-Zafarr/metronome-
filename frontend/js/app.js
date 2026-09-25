@@ -75,13 +75,6 @@ document.addEventListener('DOMContentLoaded', () => {
       num.textContent = i;
       pill.appendChild(num);
 
-      if (i === 1) {
-        const tag = document.createElement('span');
-        tag.className = 'pill-tag';
-        tag.textContent = 'DOWN';
-        pill.appendChild(tag);
-      }
-
       beatTracker.appendChild(pill);
     }
   }
