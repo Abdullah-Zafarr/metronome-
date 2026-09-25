@@ -26,7 +26,7 @@ An ultra-loud, minimalist metronome designed specifically for guitarists.
 ## 📁 Project Structure
 
 ```text
-metronome-/
+pulse-metronome/
 ├── backend/          # Lightweight Node.js streaming server
 ├── frontend/         # Pure HTML/CSS/JS metronome application
 ├── media/            # Video cinemagraph, backdrops & assets

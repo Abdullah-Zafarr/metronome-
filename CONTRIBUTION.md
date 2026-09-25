@@ -17,7 +17,7 @@ Before submitting a feature or code change, please keep our core principles in m
 ## 🛠️ How to Contribute
 
 ### 1. Reporting Bugs
-- Check the [Issues](https://github.com/Abdullah-Zafarr/metronome-/issues) tab to see if the bug has already been reported.
+- Check the [Issues](https://github.com/Abdullah-Zafarr/pulse-metronome/issues) tab to see if the bug has already been reported.
 - If not, open a new issue including:
   - A clear and descriptive title.
   - Steps to reproduce the problem.
@@ -63,10 +63,10 @@ No complicated build tools are required:
 
 ```bash
 # Clone the repository
-git clone https://github.com/Abdullah-Zafarr/metronome-.git
+git clone https://github.com/Abdullah-Zafarr/pulse-metronome.git
 
 # Navigate into the project
-cd metronome-
+cd pulse-metronome
 
 # Option A: Start with Node.js backend (Recommended)
 npm start
