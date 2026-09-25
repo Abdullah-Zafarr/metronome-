@@ -193,10 +193,12 @@ html, body {
   display: flex;
   align-items: center;
   gap: 10px;
+  line-height: 1;
 }
 
 .logo-icon {
   color: var(--accent-red);
+  display: block;
 }
 
 .logo-text {
@@ -204,20 +206,32 @@ html, body {
   font-weight: 700;
   letter-spacing: 0.5px;
   color: #fff;
+  line-height: 1;
 }
 
 .breadcrumbs {
-  font-size: 0.76rem;
+  font-size: 0.74rem;
   font-weight: 600;
   letter-spacing: 2px;
   color: var(--text-muted);
   display: flex;
   align-items: center;
   gap: 12px;
+  line-height: 1;
+  transform: translateY(-2px);
+}
+
+.breadcrumbs span {
+  display: inline-flex;
+  align-items: center;
+  line-height: 1;
 }
 
 .breadcrumbs .sep {
   color: rgba(255, 255, 255, 0.2);
+  font-weight: 400;
+  font-size: 0.7rem;
+  line-height: 1;
 }
 
 .top-actions {
