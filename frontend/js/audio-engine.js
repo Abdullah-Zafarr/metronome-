@@ -16,7 +16,7 @@ class MetronomeAudioEngine {
     this.beatsPerBar = 4;
     this.volume = 3.0; // 300% default boost
     this.soundType = 'click'; // 'click' | 'woodblock' | 'cowbell' | 'clap'
-    this.isAccentEnabled = true;
+    this.isAccentEnabled = false;
 
     this.isPlaying = false;
     this.currentBeatIndex = 0;

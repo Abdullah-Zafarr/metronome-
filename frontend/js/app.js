@@ -31,6 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const soundGrid = document.getElementById('sound-grid');
   const volSlider = document.getElementById('vol-slider');
   const boostReadout = document.getElementById('boost-readout');
+  const accentSegmented = document.getElementById('accent-segmented');
   const strobe = document.getElementById('strobe');
 
   // Sidebar Controls
@@ -179,6 +180,16 @@ document.addEventListener('DOMContentLoaded', () => {
     boostReadout.textContent = `${val}% BOOST`;
   });
 
+  // Accent Switch
+  if (accentSegmented) {
+    accentSegmented.querySelectorAll('.seg-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        accentSegmented.querySelectorAll('.seg-btn').forEach(s => s.classList.remove('active'));
+        btn.classList.add('active');
+        engine.setAccentEnabled(btn.dataset.accent === 'on');
+      });
+    });
+  }
 
   // Sidebar Toggle Logic
   function toggleSidebar(forceState) {
