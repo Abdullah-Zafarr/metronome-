@@ -34,6 +34,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const accentSegmented = document.getElementById('accent-segmented');
   const strobe = document.getElementById('strobe');
 
+  // Mini Player (PiP) Controls
+  const pipToggleBtn = document.getElementById('pip-toggle-btn');
+
   // Sidebar Controls
   const appLayout = document.querySelector('.app-layout');
   const sidebarToggleBtn = document.getElementById('sidebar-toggle-btn');
@@ -41,6 +44,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const floatingSidebarTab = document.getElementById('floating-sidebar-tab');
 
   let needleDirection = 1;
+
+  // Initialize PipManager
+  const pipManager = window.PipManager ? new PipManager({
+    engine,
+    onSetBpm: (newBpm) => setBpm(newBpm),
+    onTogglePlay: () => togglePlay()
+  }) : null;
 
   // Set BPM in all places
   function setBpm(val) {
@@ -51,6 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
     bpmSlider.value = clamped;
 
     updateDialVisuals(clamped);
+    pipManager?.updateBpm(clamped);
   }
 
   function updateDialVisuals(bpm) {
@@ -119,6 +130,9 @@ document.addEventListener('DOMContentLoaded', () => {
       if (waterCinemagraph) {
         waterCinemagraph.pulseBeat(isAccent);
       }
+
+      // 5. Sync PiP Mini Player beat tracker
+      pipManager?.onBeat(beatNumber, isAccent);
     }, delayMs);
   };
 
@@ -131,11 +145,13 @@ document.addEventListener('DOMContentLoaded', () => {
       iconPause.style.display = 'none';
       pendulumNeedle.style.transform = 'rotate(0deg)';
       beatTracker.querySelectorAll('.beat-pill').forEach(p => p.classList.remove('hit'));
+      pipManager?.updatePlayState(false);
     } else {
       engine.start();
       playBtn.classList.add('playing');
       iconPlay.style.display = 'none';
       iconPause.style.display = 'block';
+      pipManager?.updatePlayState(true);
     }
   }
 
@@ -161,6 +177,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const beats = parseInt(sig.split('/')[0], 10);
       engine.setTimeSignature(beats);
       renderBeatTracker(beats);
+      pipManager?.updateTimeSignature(beats);
     });
   });
 
@@ -187,9 +204,13 @@ document.addEventListener('DOMContentLoaded', () => {
         accentSegmented.querySelectorAll('.seg-btn').forEach(s => s.classList.remove('active'));
         btn.classList.add('active');
         engine.setAccentEnabled(btn.dataset.accent === 'on');
+        pipManager?.updateTimeSignature(engine.beatsPerBar);
       });
     });
   }
+
+  // Mini Player (Picture-in-Picture) Button Bindings
+  pipToggleBtn?.addEventListener('click', () => pipManager?.toggle());
 
   // Sidebar Toggle Logic
   function toggleSidebar(forceState) {
@@ -217,6 +238,9 @@ document.addEventListener('DOMContentLoaded', () => {
     } else if (e.code === 'KeyH') {
       e.preventDefault();
       toggleSidebar();
+    } else if (e.code === 'KeyP') {
+      e.preventDefault();
+      pipManager?.toggle();
     } else if (e.code === 'ArrowUp') {
       e.preventDefault();
       setBpm(engine.bpm + (e.shiftKey ? 5 : 1));
@@ -231,6 +255,7 @@ document.addEventListener('DOMContentLoaded', () => {
   window.__setBpm = setBpm;
   window.__togglePlay = togglePlay;
   window.__toggleSidebar = toggleSidebar;
+  window.__pipManager = pipManager;
   window.__waterCinemagraph = waterCinemagraph;
 
   // Ensure the main stage never scrolls or rubber-bands

@@ -543,7 +543,7 @@ html, body {
 .control-panel {
   background-color: var(--bg-sidebar);
   border-left: 1px solid var(--border-subtle);
-  padding: 0 18px;
+  padding: 0 18px 36px 18px;
   display: flex;
   flex-direction: column;
   gap: clamp(18px, 2.6vh, 26px);
@@ -929,6 +929,14 @@ html, body {
   background: rgba(255, 65, 54, 0.14);
   border: 1px solid var(--accent-red);
   color: #fff;
+}
+
+/* Top nav PiP toggle button active state */
+#pip-toggle-btn.active {
+  color: var(--accent-red);
+  border-color: var(--accent-red);
+  background: rgba(255, 65, 54, 0.14);
+  box-shadow: 0 0 14px rgba(255, 65, 54, 0.3);
 }
 
 /* Responsive */
