@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.1.0] - 2026-09-26
+
+### 🚀 Added
+- **Document Picture-in-Picture Mini Player**: Floating, always-on-top compact metronome window that stays visible across all browser tabs and desktop applications.
+- **Google Meet-Style Automatic Tab Switching**: Automatically pops out the mini player to the bottom-right corner when switching away from the tab while the metronome is active, and closes cleanly upon return.
+- **Top-Nav PiP Button & Shortcut**: Instant pop-out toggle directly from the top navigation bar or via the <kbd>P</kbd> keyboard shortcut.
+- **Real-Time PiP Synchronization**: Live synchronized tempo stepper, BPM readout, dynamic beat tracking pills, and Play/Pause transport controls.
+- **HTML Audio Carrier Node**: Routed audio engine output to a MediaStreamDestination carrier with MediaSession metadata for Chrome auto-PiP eligibility.
+
+### 🎨 Refined & Changed
+- **Restored Accent Toggle**: Reintroduced the manual Accent segmented toggle (`Off` / `On`) in the sidebar with `Off` as the default state for uniform beats out of the box.
+- **Sidebar Breathing Room**: Added comfortable bottom padding below the Accent card for clean spacing and zero vertical scrollbar on standard viewports.
+- **Symmetrical Mini Bar Layout**: Centered brand header and streamlined layout in the mini player window.
+
+---
+
 ## [1.0.0] - 2026-09-25
 
 ### 🚀 Added
