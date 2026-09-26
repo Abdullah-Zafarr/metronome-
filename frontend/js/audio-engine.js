@@ -110,6 +110,24 @@ class MetronomeAudioEngine {
     this.saturator.connect(this.compressor);
     this.compressor.connect(this.masterGain);
     this.masterGain.connect(this.audioCtx.destination);
+
+    // 5. Connect to MediaStreamDestination and HTML Audio Carrier for Chrome Tab-Switch Auto-PiP
+    try {
+      this.mediaStreamDest = this.audioCtx.createMediaStreamDestination();
+      this.masterGain.connect(this.mediaStreamDest);
+      let carrier = document.getElementById('pulse-audio-carrier');
+      if (!carrier) {
+        carrier = document.createElement('audio');
+        carrier.id = 'pulse-audio-carrier';
+        carrier.autoplay = true;
+        carrier.volume = 0.01;
+        document.body.appendChild(carrier);
+      }
+      carrier.srcObject = this.mediaStreamDest.stream;
+      this.audioCarrier = carrier;
+    } catch (e) {
+      // Audio carrier is optional fallback
+    }
   }
 
   makeSaturationCurve(amount = 25) {
@@ -160,6 +178,21 @@ class MetronomeAudioEngine {
     } else {
       this.scheduler();
     }
+
+    if (this.audioCarrier) {
+      this.audioCarrier.play().catch(() => {});
+    }
+
+    if ('mediaSession' in navigator) {
+      navigator.mediaSession.playbackState = 'playing';
+      try {
+        navigator.mediaSession.metadata = new MediaMetadata({
+          title: 'Pulse Metronome',
+          artist: `${this.bpm} BPM`,
+          album: `${this.beatsPerBar}/4 Time Signature`
+        });
+      } catch (e) {}
+    }
   }
 
   stop() {
@@ -168,6 +201,14 @@ class MetronomeAudioEngine {
       this.timerWorker.postMessage('stop');
     }
     clearTimeout(this.timerId);
+
+    if (this.audioCarrier) {
+      this.audioCarrier.pause();
+    }
+
+    if ('mediaSession' in navigator) {
+      navigator.mediaSession.playbackState = 'paused';
+    }
   }
 
   scheduler() {
